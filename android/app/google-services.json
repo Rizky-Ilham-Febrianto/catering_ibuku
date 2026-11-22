@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230934893846",
+    "project_id": "catering-ibuku",
+    "storage_bucket": "catering-ibuku.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230934893846:android:a902ffd2043c999a712c37",
+        "android_client_info": {
+          "package_name": "com.example.catering_ibuku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyAiE1gfvJ34sLg8tH8n1cXfffUYfle9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
