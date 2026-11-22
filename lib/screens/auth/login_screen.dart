@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import '../../utils/app_colors.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,7 +15,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailC = TextEditingController();
   final _passC = TextEditingController();
+  final _auth = AuthService();
   bool _hide = true;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -21,11 +26,19 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _loading = true);
+    try {
+      await _auth.login(_emailC.text.trim(), _passC.text);
+      // Perpindahan halaman ditangani otomatis oleh AuthGate
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login belum terhubung ke Firebase')),
+        SnackBar(content: Text(AuthService.pesanError(e))),
       );
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -103,7 +116,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(onPressed: _login, child: const Text('Masuk')),
+                  ElevatedButton(
+                    onPressed: _loading ? null : _login,
+                    child: _loading
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Masuk'),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +136,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text('Belum punya akun? ',
                           style: TextStyle(color: AppColors.muted)),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const RegisterScreen(),
+                          ),
+                        ),
                         child: const Text(
                           'Daftar',
                           style: TextStyle(
