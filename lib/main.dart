@@ -9,6 +9,8 @@ import 'screens/auth/login_screen.dart';
 import 'screens/customer/customer_home.dart';
 import 'services/auth_service.dart';
 import 'utils/app_theme.dart';
+import 'package:provider/provider.dart';
+import 'providers/cart_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +18,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initializeDateFormatting('id_ID', null);
-  runApp(const CateringIbuku());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CartProvider(),
+      child: const CateringIbuku(),
+    ),
+  );
 }
 
 class CateringIbuku extends StatelessWidget {
