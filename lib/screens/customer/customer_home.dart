@@ -3,9 +3,10 @@ import 'package:provider/provider.dart';
 import '../../models/app_user.dart';
 import '../../providers/cart_provider.dart';
 import '../../utils/app_colors.dart';
-import '../../utils/formatters.dart';
 import 'beranda_screen.dart';
+import 'keranjang_screen.dart';
 import 'menu_screen.dart';
+import 'pesanan_screen.dart';
 import 'profil_screen.dart';
 
 class CustomerHome extends StatefulWidget {
@@ -18,7 +19,13 @@ class CustomerHome extends StatefulWidget {
 
 class _CustomerHomeState extends State<CustomerHome> {
   int _index = 0;
-  static const _judul = ['Catering Ibuku', 'Daftar Menu', 'Keranjang', 'Profil'];
+  static const _judul = [
+    'Catering Ibuku',
+    'Daftar Menu',
+    'Keranjang',
+    'Pesanan Saya',
+    'Profil',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +36,11 @@ class _CustomerHomeState extends State<CustomerHome> {
         onLihatMenu: () => setState(() => _index = 1),
       ),
       const MenuScreen(),
-      const _KeranjangSementara(),
+      KeranjangScreen(
+        user: widget.user,
+        onPesananDibuat: () => setState(() => _index = 3),
+      ),
+      PesananScreen(user: widget.user),
       ProfilScreen(user: widget.user),
     ];
 
@@ -58,63 +69,11 @@ class _CustomerHomeState extends State<CustomerHome> {
             label: 'Keranjang',
           ),
           const NavigationDestination(
+              icon: Icon(Icons.receipt_long_outlined), label: 'Pesanan'),
+          const NavigationDestination(
               icon: Icon(Icons.person_outline), label: 'Profil'),
         ],
       ),
-    );
-  }
-}
-
-// Tampilan sementara, akan diganti layar keranjang + checkout di tahap berikutnya
-class _KeranjangSementara extends StatelessWidget {
-  const _KeranjangSementara();
-
-  @override
-  Widget build(BuildContext context) {
-    final cart = context.watch<CartProvider>();
-    if (cart.kosong) {
-      return const Center(
-        child: Text(
-          'Keranjang masih kosong',
-          style: TextStyle(color: AppColors.muted),
-        ),
-      );
-    }
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: cart.items
-                .map((i) => ListTile(
-                      title: Text(i.makanan.nama),
-                      subtitle: Text('${i.jumlah} x ${formatRupiah(i.makanan.harga)}'),
-                      trailing: Text(
-                        formatRupiah(i.subtotal),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ))
-                .toList(),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              const Text('Total', style: TextStyle(fontSize: 16)),
-              const Spacer(),
-              Text(
-                formatRupiah(cart.totalHarga),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
