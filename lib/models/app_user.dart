@@ -3,6 +3,8 @@ class AppUser {
   final String nama;
   final String email;
   final String noHp;
+  final String alamat;
+  final String foto; // gambar base64, boleh kosong
   final String role; // 'pelanggan' atau 'admin'
 
   AppUser({
@@ -10,6 +12,8 @@ class AppUser {
     required this.nama,
     required this.email,
     required this.noHp,
+    this.alamat = '',
+    this.foto = '',
     required this.role,
   });
 
@@ -19,6 +23,8 @@ class AppUser {
         'nama': nama,
         'email': email,
         'noHp': noHp,
+        'alamat': alamat,
+        'foto': foto,
         'role': role,
       };
 
@@ -27,6 +33,8 @@ class AppUser {
         nama: map['nama'] ?? '',
         email: map['email'] ?? '',
         noHp: map['noHp'] ?? '',
+        alamat: map['alamat'] ?? '',
+        foto: map['foto'] ?? '',
         role: map['role'] ?? 'pelanggan',
       );
 }

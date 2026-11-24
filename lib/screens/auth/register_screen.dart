@@ -14,6 +14,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _namaC = TextEditingController();
   final _hpC = TextEditingController();
+  final _alamatC = TextEditingController();
   final _emailC = TextEditingController();
   final _passC = TextEditingController();
   final _auth = AuthService();
@@ -24,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void dispose() {
     _namaC.dispose();
     _hpC.dispose();
+    _alamatC.dispose();
     _emailC.dispose();
     _passC.dispose();
     super.dispose();
@@ -38,6 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailC.text.trim(),
         password: _passC.text,
         noHp: _hpC.text.trim(),
+        alamat: _alamatC.text.trim(),
       );
       if (mounted) Navigator.of(context).pop(); // kembali ke AuthGate
     } on FirebaseAuthException catch (e) {
@@ -113,6 +116,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  controller: _alamatC,
+                  maxLines: 2,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    hintText: 'Alamat rumah (jalan, nomor, patokan)',
+                    prefixIcon: Icon(Icons.home_outlined),
+                  ),
+                  validator: (v) => (v == null || v.trim().length < 10)
+                      ? 'Isi alamat dengan lengkap'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
                   controller: _emailC,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -163,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         )
                       : const Text('Daftar'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
               ],
             ),
           ),

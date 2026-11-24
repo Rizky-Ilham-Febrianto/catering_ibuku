@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../models/app_user.dart';
 import '../../models/pesanan.dart';
-import '../../services/auth_service.dart';
 import '../../services/order_service.dart';
 import '../../utils/app_colors.dart';
 import 'dashboard_screen.dart';
 import 'laporan_screen.dart';
 import 'menu_list_screen.dart';
+import 'pengaturan_screen.dart';
 import 'pesanan_masuk_screen.dart';
 
 class AdminHome extends StatefulWidget {
@@ -20,7 +20,13 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   int _index = 0;
   late final Stream<List<Pesanan>> _stream;
-  static const _judul = ['Dashboard', 'Kelola Menu', 'Pesanan Masuk', 'Laporan'];
+  static const _judul = [
+    'Dashboard',
+    'Kelola Menu',
+    'Pesanan Masuk',
+    'Laporan',
+    'Pengaturan',
+  ];
 
   @override
   void initState() {
@@ -35,11 +41,12 @@ class _AdminHomeState extends State<AdminHome> {
       builder: (context, snap) {
         final list = snap.data ?? [];
         final menunggu = list.where((p) => p.status == 'menunggu').length;
+        final perluPesanan = _index == 0 || _index == 2 || _index == 3;
 
         Widget body;
-        if (_index != 1 && snap.hasError) {
+        if (perluPesanan && snap.hasError) {
           body = Center(child: Text('Gagal memuat: ${snap.error}'));
-        } else if (_index != 1 && !snap.hasData) {
+        } else if (perluPesanan && !snap.hasData) {
           body = const Center(child: CircularProgressIndicator());
         } else {
           body = IndexedStack(
@@ -53,6 +60,7 @@ class _AdminHomeState extends State<AdminHome> {
               const MenuListScreen(),
               PesananMasukScreen(pesanan: list),
               LaporanScreen(pesanan: list),
+              const PengaturanScreen(),
             ],
           );
         }
@@ -62,35 +70,37 @@ class _AdminHomeState extends State<AdminHome> {
             title: Text(_judul[_index]),
             backgroundColor: AppColors.dark,
             foregroundColor: Colors.white,
-            actions: [
-              IconButton(
-                tooltip: 'Keluar',
-                icon: const Icon(Icons.logout),
-                onPressed: () => AuthService().logout(),
-              ),
-            ],
           ),
           body: body,
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _index,
-            indicatorColor: AppColors.light,
-            onDestinationSelected: (i) => setState(() => _index = i),
-            destinations: [
-              const NavigationDestination(
-                  icon: Icon(Icons.dashboard_outlined), label: 'Dashboard'),
-              const NavigationDestination(
-                  icon: Icon(Icons.restaurant_menu), label: 'Menu'),
-              NavigationDestination(
-                icon: Badge(
-                  label: Text('$menunggu'),
-                  isLabelVisible: menunggu > 0,
-                  child: const Icon(Icons.notifications_outlined),
-                ),
-                label: 'Pesanan',
+          bottomNavigationBar: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              labelTextStyle: const WidgetStatePropertyAll(
+                TextStyle(fontSize: 11),
               ),
-              const NavigationDestination(
-                  icon: Icon(Icons.bar_chart), label: 'Laporan'),
-            ],
+            ),
+            child: NavigationBar(
+              selectedIndex: _index,
+              indicatorColor: AppColors.light,
+              onDestinationSelected: (i) => setState(() => _index = i),
+              destinations: [
+                const NavigationDestination(
+                    icon: Icon(Icons.dashboard_outlined), label: 'Dashboard'),
+                const NavigationDestination(
+                    icon: Icon(Icons.restaurant_menu), label: 'Menu'),
+                NavigationDestination(
+                  icon: Badge(
+                    label: Text('$menunggu'),
+                    isLabelVisible: menunggu > 0,
+                    child: const Icon(Icons.notifications_outlined),
+                  ),
+                  label: 'Pesanan',
+                ),
+                const NavigationDestination(
+                    icon: Icon(Icons.bar_chart), label: 'Laporan'),
+                const NavigationDestination(
+                    icon: Icon(Icons.settings_outlined), label: 'Pengaturan'),
+              ],
+            ),
           ),
         );
       },

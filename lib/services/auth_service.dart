@@ -13,6 +13,7 @@ class AuthService {
     required String email,
     required String password,
     required String noHp,
+    required String alamat,
   }) async {
     final cred = await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -23,6 +24,7 @@ class AuthService {
       nama: nama,
       email: email,
       noHp: noHp,
+      alamat: alamat,
       role: 'pelanggan', // pendaftar baru selalu pelanggan
     );
     await _db.collection('users').doc(user.uid).set({
@@ -43,6 +45,21 @@ class AuthService {
       return AppUser.fromMap(doc.data()!, doc.id);
     });
   }
+
+  Future<void> ubahProfil({
+    required String uid,
+    required String nama,
+    required String noHp,
+    required String alamat,
+  }) =>
+      _db.collection('users').doc(uid).update({
+        'nama': nama,
+        'noHp': noHp,
+        'alamat': alamat,
+      });
+
+  Future<void> ubahFoto(String uid, String foto) =>
+      _db.collection('users').doc(uid).update({'foto': foto});
 
   static String pesanError(FirebaseAuthException e) {
     switch (e.code) {
