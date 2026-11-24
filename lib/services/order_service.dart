@@ -40,17 +40,28 @@ class OrderService {
     });
   }
 
-  // Diurutkan di aplikasi (bukan di Firestore) supaya tidak perlu membuat index
-  Stream<List<Pesanan>> pesananSaya(String uid) {
-    return _col.where('userId', isEqualTo: uid).snapshots().map((snap) {
-      final list =
-          snap.docs.map((d) => Pesanan.fromMap(d.data(), d.id)).toList();
-      list.sort((a, b) => (b.createdAt ?? DateTime.now())
-          .compareTo(a.createdAt ?? DateTime.now()));
-      return list;
-    });
+  List<Pesanan> _urutkan(QuerySnapshot<Map<String, dynamic>> snap) {
+    final list =
+        snap.docs.map((d) => Pesanan.fromMap(d.data(), d.id)).toList();
+    list.sort((a, b) => b.tanggalMasuk.compareTo(a.tanggalMasuk));
+    return list;
   }
 
-  Future<void> batalkan(String id) =>
-      _col.doc(id).update({'status': 'dibatalkan'});
+  // Sisi pelanggan: hanya pesanan miliknya
+  Stream<List<Pesanan>> pesananSaya(String uid) {
+    return _col
+        .where('userId', isEqualTo: uid)
+        .snapshots()
+        .map(_urutkan);
+  }
+
+  // Sisi admin: semua pesanan
+  Stream<List<Pesanan>> semuaPesanan() {
+    return _col.snapshots().map(_urutkan);
+  }
+
+  Future<void> ubahStatus(String id, String status) =>
+      _col.doc(id).update({'status': status});
+
+  Future<void> batalkan(String id) => ubahStatus(id, 'dibatalkan');
 }

@@ -66,6 +66,8 @@ class Pesanan {
   String get nomor =>
       '#${id.substring(0, id.length < 5 ? id.length : 5).toUpperCase()}';
 
+  DateTime get tanggalMasuk => createdAt ?? DateTime.now();
+
   String get ringkasan =>
       items.map((i) => '${i.jumlah}x ${i.nama}').join(', ');
 
